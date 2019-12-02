@@ -11,7 +11,12 @@ import {
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
 
-const AuthenticationLiveCycle = ({ location, oidc, children }) => {
+const AuthenticationLiveCycle = ({ 
+  location,
+  oidc,
+  children, 
+  authenticatingComponentOverride: AuthenticatingComponentOverride 
+}) => {
   const { isLoadingUser, user } = oidc;
   const isShouldAuthenticate = !isLoadingUser && isRequireAuthentication(user);
   const isLoading = isLoadingUser || isShouldAuthenticate;
@@ -22,7 +27,7 @@ const AuthenticationLiveCycle = ({ location, oidc, children }) => {
     }
   }, [isShouldAuthenticate, location, user]);
 
-  return isLoading ? <Authenticating /> : <>{children}</>;
+  return isLoading ? (authenticatingComponentOverride ? <AuthenticatingComponentOverride/> : <Authenticating/>) : <>{children}</>;
 };
 
 const mapStateToProps = state => ({
@@ -46,11 +51,13 @@ export const oidcSecure = Component => props => {
 const propTypesOidcSecure = {
   isEnabled: PropTypes.bool,
   children: PropTypes.node,
+  authenticatingComponentOverride: PropTypes.elementType,
 };
 
 const defaultPropsOidcSecure = {
   isEnabled: true,
   children: null,
+  authenticatingComponentOverride: null,
 };
 
 const OidcSecure = props => {
